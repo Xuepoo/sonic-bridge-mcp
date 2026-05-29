@@ -1,5 +1,7 @@
 # SonicBridge MCP: Model Context Protocol Music Aesthetic Server
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 > [!NOTE]
 > `sonic-bridge-mcp` is a lightweight, ultra-fast, pure-Rust Model Context Protocol (MCP) server that empowers AI companion agents with **"physical listening double-ears (超级听感)"** under the LRMD protocol. It provides direct tools to analyze and compare musical versions with millisecond-level precision.
 
