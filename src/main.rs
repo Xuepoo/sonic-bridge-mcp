@@ -45,18 +45,18 @@ fn validate_alrc(content: &str) -> Result<(), String> {
         if trimmed.is_empty() || trimmed.starts_with('#') {
             continue;
         }
-        
+
         // Match standard metadata tags
-        if (trimmed.starts_with("[ti:") 
-            || trimmed.starts_with("[ar:") 
-            || trimmed.starts_with("[al:") 
-            || trimmed.starts_with("[length:") 
+        if (trimmed.starts_with("[ti:")
+            || trimmed.starts_with("[ar:")
+            || trimmed.starts_with("[al:")
+            || trimmed.starts_with("[length:")
             || trimmed.starts_with("[@alrc_"))
-            && trimmed.ends_with(']') 
+            && trimmed.ends_with(']')
         {
             continue;
         }
-        
+
         // Match standard time tags [mm:ss.ff]
         if trimmed.starts_with('[') {
             if let Some(close_idx) = trimmed.find(']') {
@@ -167,8 +167,12 @@ fn main() {
 
                         if name == "analyze_music" {
                             if let Some(args) = args {
-                                let filepath = args.get("filepath").and_then(|v| v.as_str()).unwrap_or("");
-                                let onset_mode = args.get("onset_mode").and_then(|v| v.as_bool()).unwrap_or(false);
+                                let filepath =
+                                    args.get("filepath").and_then(|v| v.as_str()).unwrap_or("");
+                                let onset_mode = args
+                                    .get("onset_mode")
+                                    .and_then(|v| v.as_bool())
+                                    .unwrap_or(false);
 
                                 let config = SonicConfig {
                                     onset_mode,
@@ -178,21 +182,44 @@ fn main() {
                                 match SonicPipeline::process_single(Path::new(filepath), &config) {
                                     Ok((meta, segs)) => {
                                         let mut report = Vec::new();
-                                        report.push("# SonicBridge: LLM-Readable Music Descriptor (LRMD)".to_string());
-                                        report.push("## 1. Global Acoustic & Musicological Metadata".to_string());
+                                        report.push(
+                                            "# SonicBridge: LLM-Readable Music Descriptor (LRMD)"
+                                                .to_string(),
+                                        );
+                                        report.push(
+                                            "## 1. Global Acoustic & Musicological Metadata"
+                                                .to_string(),
+                                        );
                                         report.push(format!("- **Filename**: `{}`", meta.filename));
-                                        report.push(format!("- **Duration**: `{:.2} seconds`", meta.duration_seconds));
-                                        report.push(format!("- **Tempo (BPM)**: `{:.1} BPM` ({})", meta.estimated_bpm, meta.tempo_feeling));
-                                        report.push(format!("- **Estimated Key**: `{}`\n", meta.estimated_global_key));
-                                        
-                                        report.push("## 2. Spatiotemporal Track Analysis".to_string());
+                                        report.push(format!(
+                                            "- **Duration**: `{:.2} seconds`",
+                                            meta.duration_seconds
+                                        ));
+                                        report.push(format!(
+                                            "- **Tempo (BPM)**: `{:.1} BPM` ({})",
+                                            meta.estimated_bpm, meta.tempo_feeling
+                                        ));
+                                        report.push(format!(
+                                            "- **Estimated Key**: `{}`\n",
+                                            meta.estimated_global_key
+                                        ));
+
+                                        report.push(
+                                            "## 2. Spatiotemporal Track Analysis".to_string(),
+                                        );
                                         report.push("| Timeline | Chord | Dynamic Intensity | Timbral Brightness | Rhythmic & Transient Activity |".to_string());
-                                        report.push("| :--- | :--- | :--- | :--- | :--- |".to_string());
-                                        
+                                        report.push(
+                                            "| :--- | :--- | :--- | :--- | :--- |".to_string(),
+                                        );
+
                                         for seg in &segs {
                                             report.push(format!(
                                                 "| **{}** | `{}` | {} | {} | {} |",
-                                                seg.time_range, seg.chord, seg.dynamic_level, seg.timbre_brightness, seg.rhythm_activity
+                                                seg.time_range,
+                                                seg.chord,
+                                                seg.dynamic_level,
+                                                seg.timbre_brightness,
+                                                seg.rhythm_activity
                                             ));
                                         }
 
@@ -228,10 +255,15 @@ fn main() {
                             }
                         } else if name == "compare_music" {
                             if let Some(args) = args {
-                                let file_a = args.get("file_a").and_then(|v| v.as_str()).unwrap_or("");
-                                let file_b = args.get("file_b").and_then(|v| v.as_str()).unwrap_or("");
-                                
-                                match SonicPipeline::process_comparative(Path::new(file_a), Path::new(file_b)) {
+                                let file_a =
+                                    args.get("file_a").and_then(|v| v.as_str()).unwrap_or("");
+                                let file_b =
+                                    args.get("file_b").and_then(|v| v.as_str()).unwrap_or("");
+
+                                match SonicPipeline::process_comparative(
+                                    Path::new(file_a),
+                                    Path::new(file_b),
+                                ) {
                                     Ok(report_text) => {
                                         send_response(
                                             id,
@@ -265,8 +297,10 @@ fn main() {
                             }
                         } else if name == "save_alrc" {
                             if let Some(args) = args {
-                                let filepath = args.get("filepath").and_then(|v| v.as_str()).unwrap_or("");
-                                let content = args.get("content").and_then(|v| v.as_str()).unwrap_or("");
+                                let filepath =
+                                    args.get("filepath").and_then(|v| v.as_str()).unwrap_or("");
+                                let content =
+                                    args.get("content").and_then(|v| v.as_str()).unwrap_or("");
 
                                 // Prior format validation gate
                                 if let Err(err_msg) = validate_alrc(content) {
