@@ -17,6 +17,7 @@ cargo build --release
 BIN_DIR="$HOME/.local/bin"
 echo -e "${STEP} Step 2: Installing binary to user-local PATH (${BIN_DIR})..."
 mkdir -p "$BIN_DIR"
+rm -f "$BIN_DIR/sonic-bridge-mcp"
 cp target/release/sonic-bridge-mcp "$BIN_DIR/"
 chmod +x "$BIN_DIR/sonic-bridge-mcp"
 echo -e "${SUCCESS} Binary successfully installed to: ${BIN_DIR}/sonic-bridge-mcp"

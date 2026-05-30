@@ -64,7 +64,7 @@ fn main() {
                                 },
                                 "serverInfo": {
                                     "name": "sonic-bridge-mcp",
-                                    "version": "0.1.0"
+                                    "version": "v0.1.1"
                                 }
                             }),
                         );
@@ -106,6 +106,18 @@ fn main() {
                                                 "file_b": { "type": "string", "description": "Absolute path to the cover/second audio file" }
                                             },
                                             "required": ["file_a", "file_b"]
+                                        }
+                                    },
+                                    {
+                                        "name": "save_alrc",
+                                        "description": "Save generated Aesthetic Lyrics (.alrc) content to the local disk, co-located next to the original audio file.",
+                                        "inputSchema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "filepath": { "type": "string", "description": "Absolute path to the original audio file (e.g. /path/to/song.mp3)" },
+                                                "content": { "type": "string", "description": "The complete text content of the generated .alrc file" }
+                                            },
+                                            "required": ["filepath", "content"]
                                         }
                                     }
                                 ]
@@ -208,6 +220,46 @@ fn main() {
                                                     {
                                                         "type": "text",
                                                         "text": format!("Error processing audio: {}", e)
+                                                    }
+                                                ]
+                                            }),
+                                        );
+                                    }
+                                }
+                            } else {
+                                send_error(Some(id), -32602, "Invalid params");
+                            }
+                        } else if name == "save_alrc" {
+                            if let Some(args) = args {
+                                let filepath = args.get("filepath").and_then(|v| v.as_str()).unwrap_or("");
+                                let content = args.get("content").and_then(|v| v.as_str()).unwrap_or("");
+
+                                let audio_path = Path::new(filepath);
+                                let alrc_path = audio_path.with_extension("alrc");
+
+                                match std::fs::write(&alrc_path, content) {
+                                    Ok(_) => {
+                                        send_response(
+                                            id,
+                                            json!({
+                                                "content": [
+                                                    {
+                                                        "type": "text",
+                                                        "text": format!("Successfully saved Aesthetic Lyrics (.alrc) to: {}", alrc_path.display())
+                                                    }
+                                                ]
+                                            }),
+                                        );
+                                    }
+                                    Err(e) => {
+                                        send_response(
+                                            id,
+                                            json!({
+                                                "isError": true,
+                                                "content": [
+                                                    {
+                                                        "type": "text",
+                                                        "text": format!("Failed to save .alrc file: {}", e)
                                                     }
                                                 ]
                                             }),
