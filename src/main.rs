@@ -38,6 +38,40 @@ fn send_error(id: Option<Value>, code: i32, message: &str) {
     stdout.flush().unwrap();
 }
 
+/// Dynamic Format Validation Guard for incoming ALRC text to protect physical storage, solving Issue #17
+fn validate_alrc(content: &str) -> Result<(), String> {
+    for (i, line) in content.lines().enumerate() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            continue;
+        }
+        
+        // Match standard metadata tags
+        if (trimmed.starts_with("[ti:") 
+            || trimmed.starts_with("[ar:") 
+            || trimmed.starts_with("[al:") 
+            || trimmed.starts_with("[length:") 
+            || trimmed.starts_with("[@alrc_"))
+            && trimmed.ends_with(']') 
+        {
+            continue;
+        }
+        
+        // Match standard time tags [mm:ss.ff]
+        if trimmed.starts_with('[') {
+            if let Some(close_idx) = trimmed.find(']') {
+                let ts = &trimmed[1..close_idx];
+                if ts.contains(':') && !ts.contains(' ') {
+                    continue;
+                }
+            }
+        }
+
+        return Err(format!("Line {}: invalid ALRC format '{}'", i + 1, trimmed));
+    }
+    Ok(())
+}
+
 fn main() {
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
@@ -64,7 +98,7 @@ fn main() {
                                 },
                                 "serverInfo": {
                                     "name": "sonic-bridge-mcp",
-                                    "version": "v0.1.1"
+                                    "version": "v0.1.2"
                                 }
                             }),
                         );
@@ -233,6 +267,23 @@ fn main() {
                             if let Some(args) = args {
                                 let filepath = args.get("filepath").and_then(|v| v.as_str()).unwrap_or("");
                                 let content = args.get("content").and_then(|v| v.as_str()).unwrap_or("");
+
+                                // Prior format validation gate
+                                if let Err(err_msg) = validate_alrc(content) {
+                                    send_response(
+                                        id,
+                                        json!({
+                                            "isError": true,
+                                            "content": [
+                                                {
+                                                    "type": "text",
+                                                    "text": format!("Validation Error: {}", err_msg)
+                                                }
+                                            ]
+                                        }),
+                                    );
+                                    return;
+                                }
 
                                 let audio_path = Path::new(filepath);
                                 let alrc_path = audio_path.with_extension("alrc");
