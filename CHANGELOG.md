@@ -4,6 +4,17 @@ All notable changes to the `sonic-bridge-mcp` server will be documented in this 
 
 ---
 
+## [0.1.2] - 2026-05-31
+
+### Added
+- **ALRC Format Validation Gate (Issue #17)**: Introduced regex-free, high-performance structured syntax verification (`validate_alrc`) inside the `save_alrc` tool to prevent corrupted or syntactically invalid lyric formatting from corrupting the workspace database.
+
+### Changed
+- Synchronized with `sonic-bridge` core library release `v0.3.6`.
+- Bumped JSON-RPC server version declaration to `v0.1.2` in `initialize` capabilities handshake.
+
+---
+
 ## [0.1.1] - 2026-05-30
 
 ### Added
