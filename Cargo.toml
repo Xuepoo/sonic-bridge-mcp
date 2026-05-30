@@ -3,6 +3,7 @@ name = "sonic-bridge-mcp"
 version = "0.1.2"
 edition = "2021"
 description = "Model Context Protocol (MCP) server for SonicBridge, providing AI agents with physical music aesthetic capabilities."
+publish = false
 
 [dependencies]
 sonic-bridge = { git = "https://github.com/Xuepoo/sonic-bridge", branch = "main" }
