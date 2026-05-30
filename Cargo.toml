@@ -1,6 +1,6 @@
 [package]
 name = "sonic-bridge-mcp"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Model Context Protocol (MCP) server for SonicBridge, providing AI agents with physical music aesthetic capabilities."
 
