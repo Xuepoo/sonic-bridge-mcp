@@ -261,8 +261,8 @@ dependencies = [
 
 [[package]]
 name = "sonic-bridge"
-version = "0.5.0"
-source = "git+https://github.com/Xuepoo/sonic-bridge?branch=main#0732b360f02dac8745a45913cdd6877bd25abebb"
+version = "0.6.0"
+source = "git+https://github.com/Xuepoo/sonic-bridge?branch=main#68324c3c13708baf1944ea6e7fd76073d31884c9"
 dependencies = [
  "ndarray",
  "rustfft",
