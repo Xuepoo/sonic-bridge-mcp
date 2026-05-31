@@ -200,8 +200,16 @@ fn main() {
                                             meta.estimated_bpm, meta.tempo_feeling
                                         ));
                                         report.push(format!(
-                                            "- **Estimated Key**: `{}`\n",
+                                            "- **Estimated Key**: `{}`",
                                             meta.estimated_global_key
+                                        ));
+                                        report.push(format!(
+                                            "- **Primary Style**: `{}`",
+                                            meta.primary_style
+                                        ));
+                                        report.push(format!(
+                                            "- **Analysis Confidence**: `{:.2}`\n",
+                                            meta.confidence
                                         ));
 
                                         report.push(
